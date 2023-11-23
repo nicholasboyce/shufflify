@@ -1,26 +1,14 @@
 export default async function spotifyDataFetch() {
 
     const clientId = "c5abae397bd547d0b99d3f55a3af65cb"; // Replace with your client ID
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
 
-    if (!code) {
-        redirectToAuthCodeFlow(clientId);
-    } else {
-        await getAccessToken(clientId, code);
-        const accessToken = sessionStorage.getItem("access_token");
-        const profile = await fetchProfile(accessToken);
-        const userID = profile.id;
-        let data = await fetchPlaylists(accessToken);
-        const playlists = data.items.map((playlist) => ({
-            name: playlist.name,
-            uri: playlist.uri
-        }));
-        console.log(playlists);
+    redirectToAuthCodeFlow(clientId);
+
+
         //if playlist selected, then fetchPlaylistItems and append to list of currItems
         // shuffle currItems. add to queue one by one. if create playlist is selected, create new playlist. then add items to new playlist
         // populateUI(profile);
-    }
+    
 
     /* || Authentication */
 
@@ -28,7 +16,8 @@ export default async function spotifyDataFetch() {
         const verifier = generateCodeVerifier(128);
         const challenge = await generateCodeChallenge(verifier);
 
-        sessionStorage.setItem("verifier", verifier);
+        localStorage.setItem("verifier", verifier);
+        localStorage.setItem("client_id", clientId);
 
         const params = new URLSearchParams();
         params.append("client_id", clientId);
@@ -60,60 +49,7 @@ export default async function spotifyDataFetch() {
             .replace(/=+$/, '');
     }
 
-    async function getAccessToken(clientId, code) {
-        const verifier = sessionStorage.getItem("verifier");
-        const refresh = sessionStorage.getItem("refresh_token");
-
-        const params = new URLSearchParams();
-        params.append("client_id", clientId);
-        if (refresh !== null) {
-            params.append("grant_type", "refresh_token");
-            params.append("refresh_token", refresh);
-        } else {
-            params.append("grant_type", "authorization_code");
-            params.append("code", code);
-            params.append("redirect_uri", "http://localhost:5173/callback");
-            params.append("code_verifier", verifier);
-        }
-
-        const result = await fetch("https://accounts.spotify.com/api/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params
-        });
-
-        const response = await result.json();
-
-        sessionStorage.setItem("access_token", response.access_token);
-        sessionStorage.setItem("refresh_token", response.refresh_token);
-    }
-
     /* || Authentication */
-
-    /* || Initial Data Retrieval */
-
-    async function fetchProfile(token) {
-        const result = await fetch("https://api.spotify.com/v1/me", {
-            method: "GET", headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const profile = await result.json()
-
-        return profile;
-    }
-
-    async function fetchPlaylists(token) {
-        const result = await fetch(`https://api.spotify.com/v1/me/playlists`, {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}`}
-        });
-
-        const playlists = await result.json();
-
-        return playlists;
-    } 
-
-    /* || Initial Data Retrieval */
 
     async function fetchPlaylistItems(token, playlist_id) {
         const result = await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
@@ -182,8 +118,5 @@ export default async function spotifyDataFetch() {
             [array[i], array[j]] = [array[j], array[i]];
           }
     }
-
-
-
 
 }

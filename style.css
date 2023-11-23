@@ -98,9 +98,50 @@ main button {
 
 main section {
   scroll-snap-align: start;
-  min-height: 100%;
+  
   padding-top: 3rem;
+  margin: 0 auto 0 4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+playlist-select {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  font-size: 3rem;
   margin: auto;
 }
 
+playlist-select form {
+  display: flex;
+  align-items: center;
+}
 
+playlist-select button {
+  padding: 0;
+  margin: 0;
+}
+
+
+@media screen and (max-width: 480px) {
+  body{
+    flex-direction: column;
+  }
+
+  header {
+    width: 100%;
+    padding: 1rem 0;
+  }
+
+  main {
+    font-size: 1.5rem;
+    justify-content: space-around;
+    padding: 1rem 0 3rem 0;
+  }
+
+  main section{
+    margin: 0 1rem;
+    min-height: auto;
+  }
+}
