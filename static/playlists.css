@@ -1,0 +1,160 @@
+:root {
+    --white: hsl(0, 0%, 100%);
+    --light-gray: hsl(212, 45%, 89%);
+    --grayish-blue: hsl(220, 15%, 55%);
+    --dark-blue: hsl(218, 44%, 22%);
+    --darker-blue: hsl(217, 45%, 15%);
+    --space-cadet: hsl(238, 35%, 15%);
+    --light-space-cadet: hsl(238, 35%, 40%);
+    --background-green: hsl(125, 90%, 30%);
+    --button-green: hsl(125, 30%, 60%);
+    --background-black: hsl(0, 0%, 0%);
+    --background-purple: hsl(300, 50%, 55%);
+}
+
+html {
+box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+box-sizing: inherit;
+margin: 0;
+padding: 0;
+}
+
+body {
+min-height: 100vh;
+display: flex;
+flex-direction: row;
+align-items: stretch;
+}
+
+header {
+display: flex;
+color: var(--space-cadet);
+background-color: var(--background-purple);
+flex-direction: column;
+font-family: 'Outfit', sans-serif;
+font-size: 1.5rem;
+text-align: center;
+align-items: center;
+justify-content: center;
+width: 25%;
+}
+
+header h1 {
+font-size: min(20vw, 5rem);
+}
+
+header p {
+margin: 0 0 1rem 0;
+}
+
+header button {
+font-family: inherit;
+border: 0;
+line-height: 3;
+padding: 0.5rem 2rem;
+border-radius: 0.5rem;
+color: var(--light-gray);
+background-color: var(--space-cadet);
+display: flex;
+align-items: center;
+gap: 1rem;
+margin-top: 0.5rem;
+font-size: 1rem;
+}
+
+header button:hover {
+background-color: var(--grayish-blue);
+color: var(--darker-blue);
+}
+
+header button:active {
+background-color: var(--light-space-cadet);
+color: var(--light-gray);
+}
+
+.fa-spotify {
+color: var(--light-gray);
+font-size: 1rem;
+}
+
+main {
+flex: 1;
+background-color: var(--space-cadet);
+font-family: 'Outfit', sans-serif;
+font-size: 1.5rem;
+color: var(--light-gray);
+overflow-y: scroll;
+scroll-snap-type: y mandatory;
+display: flex;
+}
+
+main button {
+border: 0;
+line-height: 3;
+padding: 0 2rem;
+border-radius: 0.5rem;
+color: var(--background-black);
+background-color: var(--button-green);
+display: flex;
+align-items: center;
+gap: 1rem;
+}
+
+main section {
+scroll-snap-align: start;
+padding-top: 1rem;
+display: flex;
+flex-direction: column;
+}
+
+playlist-select {
+display: flex;
+gap: 1rem;
+width: 100%;
+font-size: 3rem;
+margin: auto;
+}
+
+playlist-select form {
+display: flex;
+align-items: center;
+}
+
+playlist-select button {
+padding: 0;
+margin: 0;
+}
+
+
+@media screen and (max-width: 480px) {
+body {
+    flex-direction: column;
+}
+
+header {
+    width: 100%;
+    padding: 1rem 0;
+    align-items: center;
+    height: 50%;
+}
+
+.home-page {
+    font-size: 1.5rem;
+    justify-content: space-around;
+    padding: 1rem 0 3rem 0;
+}
+
+.home-page section{
+    margin: 0 1rem;
+    min-height: auto;
+}
+
+.home-page:last-child {
+    text-align: center;
+}
+}
