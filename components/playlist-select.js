@@ -25,33 +25,12 @@ class PlaylistSelect extends HTMLElement {
     }
 
     connectedCallback() {
+        const playlists = JSON.parse(sessionStorage.playlists);
     }
 
     static get observedAttributes() {
         return [];
     }
-
-    async fetchProfile(token) {
-        const result = await fetch("https://api.spotify.com/v1/me", {
-            method: "GET", headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const profile = await result.json()
-
-        return profile;
-    }
-
-    async fetchPlaylists(token) {
-        const result = await fetch(`https://api.spotify.com/v1/me/playlists`, {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}`}
-        });
-
-        const playlists = await result.json();
-
-        return playlists;
-    } 
-
 
 }
 

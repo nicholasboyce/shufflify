@@ -1,6 +1,6 @@
 import './style.css'
 
-import spotifyDataFetch from "./spotifyDataFetch.js"
+import connectToSpotify from "./connectToSpotify.js"
 
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
@@ -8,13 +8,8 @@ const denied = params.get("error");
 
 const spotifyConnectBtn = document.querySelector('.spotify-connect');
 
-
-const body = document.querySelector('body');
-const header = document.querySelector('header');
-const main = document.querySelector('main');
-
 spotifyConnectBtn.addEventListener('click', async () => {
-  await spotifyDataFetch();
+  await connectToSpotify();
 });
 
 if (denied) {

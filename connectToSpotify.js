@@ -1,4 +1,4 @@
-export default async function spotifyDataFetch() {
+export default async function connectToSpotify() {
 
     const clientId = "c5abae397bd547d0b99d3f55a3af65cb"; // Replace with your client ID
 
@@ -62,7 +62,8 @@ export default async function spotifyDataFetch() {
         const items = response.items.map((track) => ({
             name: track.name,
             artists: track.artists,
-            uri: track.uri
+            uri: track.uri,
+            images: track.artists.images
         }));
 
         return items;
