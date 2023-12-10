@@ -124,22 +124,31 @@ main section {
   flex-direction: column;
 }
 
-playlist-select {
+footer {
+  font-family: 'Outfit', sans-serif;
+  color: var(--light-gray);
+  background-color: var(--space-cadet);
   display: flex;
-  gap: 1rem;
-  width: 100%;
-  font-size: 3rem;
-  margin: auto;
-}
-
-playlist-select form {
-  display: flex;
+  padding-inline: min(10vw, 10rem);
+  gap: 1.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   align-items: center;
+  font-size: 0.75rem;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
-playlist-select button {
-  padding: 0;
-  margin: 0;
+footer a:nth-child(2) {
+  margin-inline-start: auto;
+}
+
+footer a:link, footer a:visited, footer a:hover, footer a:active {
+  color: var(--light-gray);
+}
+
+ion-icon {
+  font-size: 24px;
 }
 
 

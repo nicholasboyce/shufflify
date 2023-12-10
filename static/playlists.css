@@ -93,6 +93,7 @@ main {
     scroll-snap-type: y mandatory;
     display: flex;
     flex-direction: column;
+    height: 100svh;
 }
 
 main button {
@@ -112,15 +113,64 @@ main section {
     flex-direction: column;
 }
 
+.log-out {
+    display: none;
+    position: absolute;
+    z-index: 1;
+}
+
+.log-out button {
+    position: relative;
+    top: 3rem;
+    margin: auto;
+    z-index: 1;
+    display: block;
+}
+
+.show {
+    display: block;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-top: auto;
+  }
+  
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .app {
-    padding-top: 10rem;
+    padding-top: 2.5rem;
+    padding-bottom: 0.5rem;
     display: flex;
     flex-direction: column;
     row-gap: 2rem;
+    flex: 1;
+    align-items: center;
+}
+
+.instructions-wrapper {
+    margin: 0 auto;
+    flex-shrink: 1;
+    flex-grow: 0.2;
+    display: flex;
+    align-items: end;
+    width: min(80%, 577px);
 }
 
 .instructions {
     margin: 0 auto;
+    /* padding-top: 15svh; */
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    text-align: center;
 }
 
 .app form {
@@ -132,6 +182,14 @@ main section {
     font-size: clamp(1rem, 5vw, 1.5rem);
 }
 
+.app button {
+    margin-left: 1rem;
+}
+
+form button {
+    margin: 0 auto;
+}
+
 .app input {
     font-family: inherit;
     font-size: 2rem;
@@ -141,14 +199,20 @@ main section {
     width: min(458px, 80svw);
 } 
 
-.app .button-wrapper {
+.button-wrapper {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 1rem;
+}
+
+form .button-wrapper {
+    flex-wrap: nowrap;
 }
 
 .app button {
     font-family: inherit;
     width: fit-content;
-    margin: 0 auto;
 }
 
 .app .shuffle-button {
@@ -182,22 +246,77 @@ main section {
     aspect-ratio: 1;
 }
 
-playlist-select {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-    font-size: 3rem;
-    margin: auto;
+.album-art {
+    border-radius: 50%;
+    object-fit: cover;
+    width: 64px;
+    height: 64px;
+    aspect-ratio: 1;
+    margin: auto 0;
+    margin-right: 0.5rem;
 }
 
-playlist-select form {
+.track-list {
+    max-height: 60svh;
+    overflow-y: scroll;
+}
+
+.card {
+    background-color: var(--light-space-cadet);
+    width: min(80%, 35rem);
+    min-height: 7rem;
+    padding: 0.5rem 1rem;
+    margin: 1rem auto;
     display: flex;
+    border-radius: 5px;
+}
+
+.card .card-textContent {
+    margin: auto 0;
+}
+
+.card h3 {
+    font-size: 1.25rem;
+}
+
+.card p {
+    font-size: 1rem;
+}
+
+.app .reshuffle-button, .app .create-queue-button {
+    width: 15rem;
+    padding-left: 1rem;
+}
+
+.create-queue-button {
+    background-color: var(--button-green);
+}
+
+footer {
+    font-family: 'Outfit', sans-serif;
+    color: var(--light-gray);
+    background-color: var(--space-cadet);
+    display: flex;
+    padding-inline: min(10vw, 10rem);
+    gap: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     align-items: center;
+    font-size: 0.75rem;
+    width: 100%;
+    flex-wrap: wrap;
 }
 
-playlist-select button {
-    padding: 0;
-    margin: 0;
+footer a:nth-child(2) {
+    margin-inline-start: auto;
+}
+
+footer a:link, footer a:visited, footer a:hover, footer a:active {
+    color: var(--light-gray);
+}
+
+ion-icon {
+    font-size: 24px;
 }
 
 @media screen and (max-width: 1280px) {
@@ -227,6 +346,10 @@ playlist-select button {
         text-align: center;
     }
 
+    .instructions {
+        padding-top: 0;
+    }
+
     .app {
         padding: 1rem 2rem 3rem 2rem;
         font-size: 1rem;
@@ -239,8 +362,30 @@ playlist-select button {
     }
 }
 
+@media screen and (max-width: 770px) {
+    .log-out {
+        position: relative;
+    }
+
+    .log-out button {
+        top: 0;
+    }
+}
 
 @media screen and (max-width: 480px) {
+    form .button-wrapper {
+        flex-direction: column;
+    }
+
+    form .button-wrapper button {
+        margin: auto;
+        width: min(100%, 10rem);
+    }
+}
 
 
+@media screen and (max-width: 480px) {
+    .card {
+        min-height: 10rem;
+    }
 }

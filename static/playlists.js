@@ -8,8 +8,10 @@ const header = document.querySelector('header');
 const main = document.querySelector('main');
 
 const states = ['select', 'review', 'complete']; //Possible states of app once logged in
+let tracks = [];
 
 sessionStorage.currState ??= states[0]; //Checks if currState is null/undefined - if so, set to states[0] 
+let playlistSelectID = 1;
 
 if (code) {
   await getAccessToken(clientId, code);
@@ -25,14 +27,14 @@ async function getAccessToken(clientId, code) {
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
-  if (refresh !== "null" || refresh !== "undefined")  {
-      params.append("grant_type", "refresh_token");
-      params.append("refresh_token", refresh);
-  } else {
+  if (refresh === null || refresh === "undefined")  { // have to 'undefined' check in string, else it fails
     params.append("grant_type", "authorization_code");
     params.append("code", code);
     params.append("redirect_uri", "http://localhost:5173");
     params.append("code_verifier", verifier);
+  } else {
+    params.append("grant_type", "refresh_token");
+    params.append("refresh_token", refresh);
   }
 
   const result = await fetch("https://accounts.spotify.com/api/token", {
@@ -56,7 +58,8 @@ async function fetchProfile(token) {
     method: "GET", headers: { Authorization: `Bearer ${token}` }
   });
 
-  const profile = await result.json()
+  const profile = await result.json();
+  sessionStorage.user_id = profile.id;
 
   return profile;
 }
@@ -76,25 +79,114 @@ async function fetchPlaylists(token) {
 /* || Page Building */
 
 async function initialPageLoad(token) {
+    sessionStorage.currState = 'select';
     const profile = await fetchProfile(token);
+    //record profile info so we can check if premium user later
     loadTopOfPage(profile);
+
+    await renderPage(token);
+}
+
+function loadTopOfPage(profile) {
+
+    const username = document.querySelector('.display-name');
+    username.textContent = `Hi, ${profile.display_name}!`;
+
+    const profilePhoto = document.querySelector('.profile-photo');
+    const photoWrapper = document.querySelector('.photo-wrapper');
+
+    const logOutBtn = document.querySelector('.log-out');
+    
+
+   photoWrapper.addEventListener('click', () => {
+        //log out option
+        logOutBtn.classList.toggle('show');
+    });
+
+    logOutBtn.addEventListener('click', () => {
+        logOut();
+        console.log('Logged out safely!');
+    });
+    
+    if (profile.images.length > 0) {
+        profilePhoto.src = profile.images.url;
+    } else {
+        profilePhoto.src = '../shufflify-logo.png';
+    }
+}
+
+function logOut() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location = '/';
+}
+
+function createPlaylistSelect(playlists) {
+
+    //const label = document.createElement('label');
+    //label.setAttribute('for', `${playlistSelectID}`);
+    //label.style.display = 'none';
+
+    const input = document.createElement('input');
+    input.setAttribute('list', `playlist-names-${playlistSelectID}`);
+    input.setAttribute('id', `${playlistSelectID}`);
+    input.setAttribute('name', `playlist-${playlistSelectID}`);
+
+    const dropDown = document.createElement('datalist');
+    dropDown.setAttribute('id', `playlist-names-${playlistSelectID}`);
+
+    for (const playlist of playlists) {
+        const option = document.createElement('option');
+        option.dataset.value = playlist.id;
+        option.value = option.textContent = playlist.name;
+        dropDown.appendChild(option);
+    }
+
+    playlistSelectID++;
+
+    return [input, dropDown];
+}
+
+async function fetchPlaylistItems(token, playlist_id) {
+    const result = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}/tracks`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}`}
+    });
+
+    const response = await result.json();
+
+    const items = response.items.map((item) => ({
+        name: item.track.name,
+        artists: item.track.artists,
+        uri: item.track.uri,
+        images: item.track.album.images
+    }));
+
+    return items;
+}
+
+async function renderPage(token) {
     const app = document.querySelector('.app');
     const instructions = document.querySelector('.instructions');
 
     switch(sessionStorage.currState) {
         case('select'):
-            instructions.textContent = 'Select your playlists to shuffle together.';
+            instructions.textContent = 'Select up to 4 playlists to shuffle together!';
+            app.textContent = '';
             const data = await fetchPlaylists(token);
             const playlists = data.items?.map((playlist) => ({
                 name: playlist.name,
                 uri: playlist.uri,
                 public: playlist.public,
-                images: playlist.images
+                images: playlist.images,
+                id: playlist.id
             }));
             sessionStorage.playlists = JSON.stringify(playlists);
             const form = document.createElement('form');
-            const buttonWrapper = document.createElement('div');
-            buttonWrapper.classList.add('button-wrapper');
+            form.setAttribute('method', 'GET');
+            form.setAttribute('action', '/playlists/');
+            const selButtonWrapper = document.createElement('div');
+            selButtonWrapper.classList.add('button-wrapper');
 
             sessionStorage.playlistAmountState = 2;
 
@@ -127,14 +219,34 @@ async function initialPageLoad(token) {
             });
 
             const submitBtn = document.createElement('button');
+
+            form.appendChild(selButtonWrapper);
+
+            selButtonWrapper.appendChild(removeBtn);
+            selButtonWrapper.appendChild(addBtn);
+            selButtonWrapper.appendChild(submitBtn);
+
+            submitBtn.type = 'submit';
             submitBtn.classList.add('shuffle-button');
             submitBtn.textContent = 'Shuffle!';
+            submitBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const playlistIDs = [];
+                const formInputs = document.querySelectorAll('form input');
+                for (const input of formInputs) {
+                    playlistIDs.push(document.querySelector(`#${input.list.id} option[value='${input.value}']`).dataset.value);
+                }
+                for (const playlistID of playlistIDs) {
+                    const items = await fetchPlaylistItems(token, playlistID);
+                    items.forEach((track) => tracks.push(track));
+                }
+                console.log(tracks);
+                sessionStorage.currState = 'review';
+                await renderPage(token);
+                //switch state and re-render accordingly
+            });
 
             app.appendChild(form);
-            form.appendChild(buttonWrapper);
-            buttonWrapper.appendChild(removeBtn);
-            buttonWrapper.appendChild(addBtn);
-            buttonWrapper.appendChild(submitBtn);
 
 
             let list = createPlaylistSelect(playlists);
@@ -142,47 +254,149 @@ async function initialPageLoad(token) {
             list = createPlaylistSelect(playlists);
             list.forEach((element) => form.appendChild(element));
             
-            
+            break;
 
         case('review'):
+            instructions.textContent = 'Review your shuffle!';
+            app.textContent = '';
+            shuffle(tracks);
+
+            const trackList = document.createElement('div');
+            trackList.classList.add('track-list');
+            app.appendChild(trackList);
+            
+            for (const track of tracks) {
+                trackList.appendChild(createTrackCard(track));
+            }
+
+            const reshuffleBtn = document.createElement('button');
+            reshuffleBtn.classList.add('reshuffle-button');
+            reshuffleBtn.textContent = 'Reshuffle';
+            reshuffleBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await renderPage(token);
+            });
+
+            const createQueueBtn = document.createElement('button');
+            createQueueBtn.classList.add('create-queue-button');
+            createQueueBtn.textContent = 'Create playlist';
+            createQueueBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const playlist = await createPlaylist(token, tracks);
+                console.log(playlist.name, playlist.id);
+                sessionStorage.currState = 'complete';
+                await renderPage(token);j
+            });
+
+            const reviewButtonWrapper = document.createElement('div');
+            reviewButtonWrapper.classList.add('button-wrapper');
+            reviewButtonWrapper.appendChild(reshuffleBtn);
+            reviewButtonWrapper.appendChild(createQueueBtn);
+
+            app.appendChild(reviewButtonWrapper);
+
+            // app.appendChild(createQueueBtn);
+
             console.log(`Curr state: ${sessionStorage.currState}`);
+            break;
+
         case('complete'):
+            instructions.textContent = 'Check out your new shuffle! Refresh the page to make another!'
+            app.textContent = '';
+
+            const newShuffleBtn = document.createElement('button');
+            newShuffleBtn.textContent = 'Let\'s go again!';
+            newShuffleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                sessionStorage.currState = 'select';
+                renderPage(token);
+            });
+
+            const goHomeButton = document.createElement('button');
+            goHomeButton.textContent = 'Log out';
+            goHomeButton.addEventListener('click', logOut);
+
+            app.appendChild(newShuffleBtn);
+            app.appendChild(goHomeButton);
+
             console.log(`Curr state: ${sessionStorage.currState}`);
+            break;
     }
 }
 
-function loadTopOfPage(profile) {
-
-    const username = document.querySelector('.display-name');
-    username.textContent = `Hi, ${profile.display_name}!`;
-
-    const profilePhoto = document.querySelector('.profile-photo');
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
     
-    if (profile.images.length > 0) {
-        profilePhoto.src = profile.images.url;
-    } else {
-        profilePhoto.src = '../shufflify-logo.png';
-    }
+        [array[i], array[j]] = [array[j], array[i]];
+      }
 }
 
-function logOut() {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location = '/';
+function createTrackCard(track) {
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const photo = document.createElement('img');
+    photo.classList.add('album-art');
+    photo.src = track.images[0].url;
+
+    const text = document.createElement('div');
+    text.classList.add('card-textContent');
+
+    const name = document.createElement('h3');
+    name.textContent = track.name;
+
+    const artist = document.createElement('p');
+    artist.textContent = track.artists[0].name;
+
+    card.appendChild(photo);
+    card.appendChild(text);
+    text.appendChild(name);
+    text.appendChild(artist);
+
+    return card;
 }
 
-function createPlaylistSelect(playlists) {
-    const input = document.createElement('input');
-    input.setAttribute('list', 'playlist-names');
+async function addToQueue(token, uri) {
+    const result = await fetch(`https://api.spotify.com/v1/me/player/queue`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`},
+        body: new URLSearchParams({
+            uri: uri 
+        })
+    });
+    
+    //check if successful
+}
 
-    const dropDown = document.createElement('datalist');
-    dropDown.setAttribute('id', 'playlist-names');
+async function createPlaylist(token,uriList) {
 
-    for (const playlist of playlists) {
-        const option = document.createElement('option');
-        option.value = option.textContent = playlist.name;
-        dropDown.appendChild(option);
-    }
+    const user_id = sessionStorage.user_id;
+    const name = prompt('Name of playlist:');
+    const description = prompt('Description of playlist:');
 
-    return [input, dropDown];
+
+    const result = await fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`},
+        body: JSON.stringify({
+            "name": name ?? "Shufflify Playlist",
+            "public": false,
+            "description": description ?? "A playlist created by Shufflify." 
+        })
+    });
+
+    const playlist = await result.json();
+    console.log(playlist);
+
+
+    await fetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`},
+        body: JSON.stringify({
+            uris: uriList.map((track) => track.uri) 
+        })
+    });
+
+    return playlist;
 }

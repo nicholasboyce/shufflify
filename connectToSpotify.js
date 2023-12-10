@@ -27,7 +27,7 @@ export default async function connectToSpotify() {
         params.append("code_challenge_method", "S256");
         params.append("code_challenge", challenge);
 
-        document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+        window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
     }
 
     function generateCodeVerifier(length) {
@@ -83,31 +83,38 @@ export default async function connectToSpotify() {
     }
 
 
-    async function createPlaylist(token, uriList, user_id) {
+    async function createPlaylist(token, user_id) {
 
         const result = await fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}`},
             body: new URLSearchParams({
-                uris: uriList.map((item) => item.uri),
                 name: "Shufflify Playlist",
                 public: false,
                 description: "A playlist created by Shufflify." 
             })
         });
 
-        const playlist = await result.json()
+        const playlist = await result.json();
+
+        await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}`},
+            body: new URLSearchParams({
+                uris: uriList 
+            })
+        });
 
         return playlist;
     }
 
     async function addTracksToPlaylist(token, uriList, playlist_id) {
 
-        const result = await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
+        await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}`},
             body: new URLSearchParams({
-                uris: uriList.map((item) => item.uri) 
+                uris: uriList 
             })
         });
     }
