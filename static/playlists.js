@@ -1,11 +1,7 @@
+import profilePhotoURL from '../images/shufflify-logo.png'
 
 const code = sessionStorage.getItem("code");
 const clientId = localStorage.getItem("client_id");
-
-
-const body = document.querySelector('body');
-const header = document.querySelector('header');
-const main = document.querySelector('main');
 
 const states = ['select', 'review', 'complete']; //Possible states of app once logged in
 let tracks = [];
@@ -113,7 +109,7 @@ function loadTopOfPage(profile) {
     if (profile.images.length > 0) {
         profilePhoto.src = profile.images.url;
     } else {
-        profilePhoto.src = '../images/shufflify-logo.png';
+        profilePhoto.src = profilePhotoURL;
     }
 }
 
@@ -312,7 +308,7 @@ async function renderPage(token) {
             break;
 
         case('complete'):
-            instructions.textContent = 'Click above to check out your new shuffled playlist!'
+            instructions.textContent = 'Playlist made! Now you can check out on Spotify!'
             app.textContent = '';
 
             const spotifyConnectBtn = document.querySelector('.spotify-connect');
@@ -327,6 +323,7 @@ async function renderPage(token) {
             newShuffleBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 sessionStorage.currState = 'select';
+                spotifyConnectBtn.style.display = 'none';
                 renderPage(token);
             });
 
