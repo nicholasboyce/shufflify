@@ -61,7 +61,7 @@ header button {
     border-radius: 0.5rem;
     color: var(--light-gray);
     background-color: var(--space-cadet);
-    display: flex;
+    display: none;
     align-items: center;
     gap: 1rem;
     margin-top: 0.5rem;
@@ -283,12 +283,14 @@ form .button-wrapper {
     font-size: 1rem;
 }
 
-.app .reshuffle-button, .app .create-queue-button {
+.app .reshuffle-button, 
+.app .create-playlist-button,
+.app .add-to-queue-button {
     width: 15rem;
     padding-left: 1rem;
 }
 
-.create-queue-button {
+.create-playlist-button {
     background-color: var(--button-green);
 }
 

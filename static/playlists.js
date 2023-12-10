@@ -9,14 +9,15 @@ const main = document.querySelector('main');
 
 const states = ['select', 'review', 'complete']; //Possible states of app once logged in
 let tracks = [];
+let playlistURL = '';
 
 sessionStorage.currState ??= states[0]; //Checks if currState is null/undefined - if so, set to states[0] 
 let playlistSelectID = 1;
 
 if (code) {
-  await getAccessToken(clientId, code);
-  const accessToken = localStorage.getItem("access_token");
-  await initialPageLoad(accessToken);
+    await getAccessToken(clientId, code);
+    const accessToken = localStorage.getItem("access_token");
+    await initialPageLoad(accessToken);
 }
 
 /* || Authentication */
@@ -27,7 +28,7 @@ async function getAccessToken(clientId, code) {
 
   const params = new URLSearchParams();
   params.append("client_id", clientId);
-  if (refresh === null || refresh === "undefined")  { // have to 'undefined' check in string, else it fails
+  if (refresh === null || refresh === "undefined")  { // have to have 'undefined' check in string, else it fails
     params.append("grant_type", "authorization_code");
     params.append("code", code);
     params.append("redirect_uri", "http://localhost:5173");
@@ -60,6 +61,7 @@ async function fetchProfile(token) {
 
   const profile = await result.json();
   sessionStorage.user_id = profile.id;
+  sessionStorage.product = profile.product;
 
   return profile;
 }
@@ -81,7 +83,7 @@ async function fetchPlaylists(token) {
 async function initialPageLoad(token) {
     sessionStorage.currState = 'select';
     const profile = await fetchProfile(token);
-    //record profile info so we can check if premium user later
+
     loadTopOfPage(profile);
 
     await renderPage(token);
@@ -111,7 +113,7 @@ function loadTopOfPage(profile) {
     if (profile.images.length > 0) {
         profilePhoto.src = profile.images.url;
     } else {
-        profilePhoto.src = '../shufflify-logo.png';
+        profilePhoto.src = '../images/shufflify-logo.png';
     }
 }
 
@@ -240,7 +242,7 @@ async function renderPage(token) {
                     const items = await fetchPlaylistItems(token, playlistID);
                     items.forEach((track) => tracks.push(track));
                 }
-                console.log(tracks);
+
                 sessionStorage.currState = 'review';
                 await renderPage(token);
                 //switch state and re-render accordingly
@@ -277,32 +279,48 @@ async function renderPage(token) {
                 await renderPage(token);
             });
 
-            const createQueueBtn = document.createElement('button');
-            createQueueBtn.classList.add('create-queue-button');
-            createQueueBtn.textContent = 'Create playlist';
-            createQueueBtn.addEventListener('click', async (e) => {
+            const createPlaylistBtn = document.createElement('button');
+            createPlaylistBtn.classList.add('create-playlist-button');
+            createPlaylistBtn.textContent = 'Create playlist';
+            createPlaylistBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 const playlist = await createPlaylist(token, tracks);
-                console.log(playlist.name, playlist.id);
+                playlistURL = playlist.external_urls.spotify;
                 sessionStorage.currState = 'complete';
-                await renderPage(token);j
+                await renderPage(token);
             });
+
+            if (sessionStorage.product === 'premium') {
+                const addToQueueBtn = document.createElement('button');
+                addToQueueBtn.classList.add('add-to-queue-button');
+                addToQueueBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    for (const track of tracks) {
+                        await addToQueue(token, track.uri);
+                    }
+                })
+            } 
 
             const reviewButtonWrapper = document.createElement('div');
             reviewButtonWrapper.classList.add('button-wrapper');
             reviewButtonWrapper.appendChild(reshuffleBtn);
-            reviewButtonWrapper.appendChild(createQueueBtn);
+            reviewButtonWrapper.appendChild(createPlaylistBtn);
+            if (typeof addToQueueBtn !== 'undefined') reviewButtonWrapper.appendChild(addToQueueBtn);
 
             app.appendChild(reviewButtonWrapper);
 
-            // app.appendChild(createQueueBtn);
-
-            console.log(`Curr state: ${sessionStorage.currState}`);
             break;
 
         case('complete'):
-            instructions.textContent = 'Check out your new shuffle! Refresh the page to make another!'
+            instructions.textContent = 'Click above to check out your new shuffled playlist!'
             app.textContent = '';
+
+            const spotifyConnectBtn = document.querySelector('.spotify-connect');
+            spotifyConnectBtn.style.display = 'flex';
+            spotifyConnectBtn.addEventListener('click', () => {
+                window.open(playlistURL, '_blank');
+            });
+
 
             const newShuffleBtn = document.createElement('button');
             newShuffleBtn.textContent = 'Let\'s go again!';
@@ -316,10 +334,10 @@ async function renderPage(token) {
             goHomeButton.textContent = 'Log out';
             goHomeButton.addEventListener('click', logOut);
 
+            newShuffleBtn.style.width = goHomeButton.style.width = '10rem';
             app.appendChild(newShuffleBtn);
             app.appendChild(goHomeButton);
 
-            console.log(`Curr state: ${sessionStorage.currState}`);
             break;
     }
 }
@@ -358,7 +376,7 @@ function createTrackCard(track) {
 }
 
 async function addToQueue(token, uri) {
-    const result = await fetch(`https://api.spotify.com/v1/me/player/queue`, {
+    await fetch(`https://api.spotify.com/v1/me/player/queue`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`},
         body: new URLSearchParams({

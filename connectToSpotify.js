@@ -4,12 +4,6 @@ export default async function connectToSpotify() {
 
     redirectToAuthCodeFlow(clientId);
 
-
-        //if playlist selected, then fetchPlaylistItems and append to list of currItems
-        // shuffle currItems. add to queue one by one. if create playlist is selected, create new playlist. then add items to new playlist
-        // populateUI(profile);
-    
-
     /* || Authentication */
 
     async function redirectToAuthCodeFlow(clientId) {
@@ -47,84 +41,6 @@ export default async function connectToSpotify() {
             .replace(/\+/g, '-')
             .replace(/\//g, '_')
             .replace(/=+$/, '');
-    }
-
-    /* || Authentication */
-
-    async function fetchPlaylistItems(token, playlist_id) {
-        const result = await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}`}
-        });
-
-        const response = await result.json();
-
-        const items = response.items.map((track) => ({
-            name: track.name,
-            artists: track.artists,
-            uri: track.uri,
-            images: track.artists.images
-        }));
-
-        return items;
-    } 
-
-
-    async function addToQueue(token, uri) {
-        const result = await fetch(`https://api.spotify.com/v1/me/player/queue`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`},
-            body: new URLSearchParams({
-                uri: uri 
-            })
-        });
-        
-        //check if successful
-    }
-
-
-    async function createPlaylist(token, user_id) {
-
-        const result = await fetch(`https://api.spotify.com/v1/users/${user_id}/playlists`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`},
-            body: new URLSearchParams({
-                name: "Shufflify Playlist",
-                public: false,
-                description: "A playlist created by Shufflify." 
-            })
-        });
-
-        const playlist = await result.json();
-
-        await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`},
-            body: new URLSearchParams({
-                uris: uriList 
-            })
-        });
-
-        return playlist;
-    }
-
-    async function addTracksToPlaylist(token, uriList, playlist_id) {
-
-        await fetch(`https://api.spotify.com/v1/playlist/${playlist_id}/tracks`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`},
-            body: new URLSearchParams({
-                uris: uriList 
-            })
-        });
-    }
-
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
-        
-            [array[i], array[j]] = [array[j], array[i]];
-          }
     }
 
 }
