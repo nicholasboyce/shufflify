@@ -107,7 +107,7 @@ function loadTopOfPage(profile) {
     });
     
     if (profile.images.length > 0) {
-        profilePhoto.src = profile.images.url;
+        profilePhoto.src = profile.images[0].url;
     } else {
         profilePhoto.src = profilePhotoURL;
     }
