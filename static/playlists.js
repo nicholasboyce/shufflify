@@ -121,10 +121,6 @@ function logOut() {
 
 function createPlaylistSelect(playlists) {
 
-    //const label = document.createElement('label');
-    //label.setAttribute('for', `${playlistSelectID}`);
-    //label.style.display = 'none';
-
     const input = document.createElement('input');
     input.setAttribute('list', `playlist-names-${playlistSelectID}`);
     input.setAttribute('id', `${playlistSelectID}`);
