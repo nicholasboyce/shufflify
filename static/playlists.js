@@ -230,7 +230,7 @@ async function renderPage(token) {
                 const playlistIDs = [];
                 const formInputs = document.querySelectorAll('form input');
                 for (const input of formInputs) {
-                    playlistIDs.push(document.querySelector(`#${input.list.id} option[value=${input.value}]`).dataset.value);
+                    playlistIDs.push(document.querySelector(`#${input.list.id} option[value='${input.value}']`).dataset.value);
                 }
                 for (const playlistID of playlistIDs) {
                     const items = await fetchPlaylistItems(token, playlistID);
