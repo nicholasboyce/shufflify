@@ -132,7 +132,8 @@ function createPlaylistSelect(playlists) {
     for (const playlist of playlists) {
         const option = document.createElement('option');
         option.dataset.value = playlist.id;
-        option.value = option.textContent = playlist.name;
+        const cleanedName = JSON.stringify(playlist.name);
+        option.value = option.textContent = cleanedName;
         dropDown.appendChild(option);
     }
 
