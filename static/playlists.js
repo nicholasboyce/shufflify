@@ -228,10 +228,8 @@ async function renderPage(token) {
                 const playlistIDs = [];
                 const formInputs = document.querySelectorAll('form input');
                 for (const input of formInputs) {
-                    console.log(`'${input.value}'`);
                     let cleanedName = input.value.replaceAll(/'/g, "\\'");
                     cleanedName = cleanedName.replaceAll(/"/g, '\\"');
-                    console.log(cleanedName);
                     playlistIDs.push(document.querySelector(`#${input.list.id} option[value='${cleanedName}']`).dataset.value);
                 }
                 for (const playlistID of playlistIDs) {
@@ -402,8 +400,6 @@ async function createPlaylist(token,uriList) {
     });
 
     const playlist = await result.json();
-    console.log(playlist);
-
 
     await fetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
         method: "POST",
