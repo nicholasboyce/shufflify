@@ -132,9 +132,7 @@ function createPlaylistSelect(playlists) {
     for (const playlist of playlists) {
         const option = document.createElement('option');
         option.dataset.value = playlist.id;
-        let cleanedName = playlist.name.replaceAll(/'/g, "\\'");
-        cleanedName = cleanedName.replaceAll(/"/g, '\\"');
-        option.value = option.textContent = cleanedName;
+        option.value = option.textContent = playlist.name;
         dropDown.appendChild(option);
     }
 
@@ -231,7 +229,10 @@ async function renderPage(token) {
                 const formInputs = document.querySelectorAll('form input');
                 for (const input of formInputs) {
                     console.log(`'${input.value}'`);
-                    playlistIDs.push(document.querySelector(`#${input.list.id} option[value='${input.value}']`).dataset.value);
+                    let cleanedName = input.value.replaceAll(/'/g, "\\'");
+                    cleanedName = cleanedName.replaceAll(/"/g, '\\"');
+                    console.log(cleanedName);
+                    playlistIDs.push(document.querySelector(`#${input.list.id} option[value='${cleanedName}']`).dataset.value);
                 }
                 for (const playlistID of playlistIDs) {
                     const items = await fetchPlaylistItems(token, playlistID);
