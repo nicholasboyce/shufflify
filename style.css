@@ -42,7 +42,7 @@ header {
   align-items: flex-start;
   justify-content: center;
   padding-inline-start: min(10vw, 10rem);
-  height: 55svh;
+  padding-block: 5svh;
 }
 
 header h1 {
