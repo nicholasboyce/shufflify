@@ -105,6 +105,16 @@ main {
   gap: 1rem;
 }
 
+.steps {
+  margin-inline-start: 1.625rem;
+  display: grid;
+  row-gap: 1rem;
+}
+
+.steps + p {
+  font-weight: 700;
+}
+
 main button {
   border: 0;
   line-height: 3;
@@ -167,7 +177,8 @@ ion-icon {
   .home-page {
     font-size: 1.5rem;
     justify-content: space-around;
-    padding: 1rem 0 3rem 0;
+    padding-inline-end: min(10vw, 10rem);
+    row-gap: 2rem;
   }
 
   .home-page section{
@@ -175,7 +186,7 @@ ion-icon {
     min-height: auto;
   }
 
-  .home-page:last-child {
-    text-align: center;
+  .steps {
+    row-gap: 2rem;
   }
 }
