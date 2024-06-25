@@ -1,4 +1,5 @@
-import profilePhotoURL from '../images/shufflify-logo.png'
+import profilePhotoURL from '../images/shufflify-logo.png';
+import spotifySVG from '../images/spotify.svg';
 
 const code = sessionStorage.getItem("code");
 const clientId = localStorage.getItem("client_id");
@@ -362,15 +363,28 @@ function createTrackCard(track) {
 
     const trackLink = document.createElement('a');
     trackLink.href = track.url;
+    trackLink.target = '_blank';
 
     const artist = document.createElement('p');
     artist.textContent = track.artists[0].name;
+
+    const playOnSpotifyButton = document.createElement('button');
+    playOnSpotifyButton.textContent = 'Play on Spotify';
+    playOnSpotifyButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.open(track.url, '_blank');
+    });
+
+    const logoIconSVG = document.createElement('img');
+    logoIconSVG.src = spotifySVG;
+    playOnSpotifyButton.appendChild(logoIconSVG);
 
     card.appendChild(photo);
     card.appendChild(text);
     trackLink.appendChild(name);
     text.appendChild(trackLink);
     text.appendChild(artist);
+    text.appendChild(playOnSpotifyButton);
 
     return card;
 }
