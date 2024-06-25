@@ -27,7 +27,7 @@ async function getAccessToken(clientId, code) {
   if (refresh === null || refresh === "undefined")  { // have to have 'undefined' check in string, else it fails
     params.append("grant_type", "authorization_code");
     params.append("code", code);
-    params.append("redirect_uri", "https://www.shufflify.app");
+    params.append("redirect_uri", "http://localhost:5173");
     params.append("code_verifier", verifier);
   } else {
     params.append("grant_type", "refresh_token");
@@ -153,7 +153,8 @@ async function fetchPlaylistItems(token, playlist_id) {
         name: item.track.name,
         artists: item.track.artists,
         uri: item.track.uri,
-        images: item.track.album.images
+        images: item.track.album.images,
+        url: `https://open.spotify.com/track/${item.track.id}`
     }));
 
     return items;
@@ -359,12 +360,16 @@ function createTrackCard(track) {
     const name = document.createElement('h3');
     name.textContent = track.name;
 
+    const trackLink = document.createElement('a');
+    trackLink.href = track.url;
+
     const artist = document.createElement('p');
     artist.textContent = track.artists[0].name;
 
     card.appendChild(photo);
     card.appendChild(text);
-    text.appendChild(name);
+    trackLink.appendChild(name);
+    text.appendChild(trackLink);
     text.appendChild(artist);
 
     return card;

@@ -276,11 +276,17 @@ form .button-wrapper {
 }
 
 .card h3 {
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 0.958rem + 0.269vw, 1.2rem);
 }
 
 .card p {
     font-size: 1rem;
+}
+
+.card-textContent a {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--white);
 }
 
 .app .reshuffle-button, 
