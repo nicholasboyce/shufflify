@@ -17,7 +17,7 @@ export default async function connectToSpotify() {
         params.append("client_id", clientId);
         params.append("response_type", "code");
         params.append("redirect_uri", "https://shufflify.app");
-        params.append("scope", "user-read-private user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public");
+        params.append("scope", "user-read-private playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public");
         params.append("code_challenge_method", "S256");
         params.append("code_challenge", challenge);
 
