@@ -28,7 +28,7 @@ async function getAccessToken(clientId, code) {
   if (refresh === null || refresh === "undefined")  { // have to have 'undefined' check in string, else it fails
     params.append("grant_type", "authorization_code");
     params.append("code", code);
-    params.append("redirect_uri", "http://localhost:5173");
+    params.append("redirect_uri", "http://shufflify.app");
     params.append("code_verifier", verifier);
   } else {
     params.append("grant_type", "refresh_token");
