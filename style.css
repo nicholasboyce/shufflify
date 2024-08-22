@@ -103,6 +103,7 @@ main {
   padding-inline-start: min(10vw, 10rem);
   margin: auto 0;
   gap: 1rem;
+  padding-block-start: clamp(0.5rem, 3.568rem + -3.409vw, 2.75rem);
 }
 
 .steps {
