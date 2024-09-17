@@ -1,0 +1,13 @@
+{
+    "name": "Shufflify",
+    "display": "standalone",
+    "description": "A simple Shufflify app",
+    "icons": [
+      {
+        "src": "./images/shufflify-logo.png",
+        "type": "image/png",
+        "sizes": "57x57"
+      }
+    ]
+  }
+  
